@@ -1,5 +1,7 @@
 package com.hackerrank.api.service.impl;
 
+import com.hackerrank.api.exception.AppExceptionHandlerControllerAdvice;
+import com.hackerrank.api.exception.BadRequestException;
 import com.hackerrank.api.exception.ElementNotFoundException;
 import com.hackerrank.api.model.Dog;
 import com.hackerrank.api.repository.DogRepository;
@@ -26,13 +28,16 @@ public class DefaultDogService implements DogService {
 
   @Override
   public Dog createNewDog(Dog dog) {
-    return dogRepository.save(dog);
+     return dogRepository.save(dog);
   }
+
 
   @Override
   public Dog getDogById(Long id) {
-    return dogRepository
-            .findById(id)
-            .orElseThrow(() -> new ElementNotFoundException("Dog with ID not found"));
+    Boolean existsDog = dogRepository.selectExistsDog(id);
+    if (!existsDog) {
+      throw new ElementNotFoundException("Dog with ID not found");
+    }
+    return dogRepository.findById(id).orElseThrow(() -> new ElementNotFoundException("Dog with ID not found"));
   }
 }
